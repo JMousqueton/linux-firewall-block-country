@@ -76,4 +76,38 @@ detect_version_id () {
   fi
 }
 
-echo Test
+
+ipset_check ()
+{
+  echo "Checking for ipset..."
+  if command -v ipset > /dev/null; then
+    echo "Detected ipset..."
+  else
+    echo "Installing ipset..."
+    apt-get install -q -y ipset
+    if [ "$?" -ne "0" ]; then
+      echo "Unable to install ipset ! Your base system has a problem; please check your default OS's package repositories because ipset should work."
+      echo "Repository installation aborted."
+      exit 1
+    fi
+  fi
+}
+
+# MAIN
+# --------------------------------------
+ipset_check 
+
+# Create the ipset list
+ipset -N china hash:net
+
+# remove any old list that might exist from previous runs of this script
+rm /tmp/cn.zone
+
+# Pull the latest IP set for China
+wget -P /tmp http://www.ipdeny.com/ipblocks/data/countries/cn.zone 
+
+# Add each IP address from the downloaded list into the ipset 'china'
+for i in $(cat /tmp/cn.zone ); do ipset -A china $i; done
+
+# Restore iptables
+/sbin/iptables-restore < /etc/iptables.firewall.rules
