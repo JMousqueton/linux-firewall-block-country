@@ -13,3 +13,5 @@
 ```
 0 5 * * * /etc/block-china.sh
 ```
+
+you can check with the commande ```iptables -L```
