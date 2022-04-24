@@ -11,7 +11,7 @@
 
 ```crontab -e```
 ```
-0 5 * * * /etc/block-china.sh
+0 5 * * * /etc/block-china.sh > /dev/null 2>&1
 ```
 
 you can check with the commande ```iptables -L```
